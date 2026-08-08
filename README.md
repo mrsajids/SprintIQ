@@ -37,12 +37,11 @@ This project is being built as a production-style SaaS portfolio project, with a
 
 ## 🛠️ Planned Technology
 
-* **Frontend:** [Your frontend stack]
-* **Backend:** [Your backend stack]
-* **Database:** [Your database]
-* **Authentication:** [Your auth solution]
-* **AI:** [Your AI provider/model]
-* **Deployment:** [Your deployment platform]
+* **Frontend:** React, Typescript
+* **Backend:** Node.js
+* **Database:** Postgres
+* **AI:** Open AI Api
+* **Deployment:** will come soon
 
 ## 📌 Why SprintIQ?
 
