@@ -9,9 +9,11 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@prisma/client": "^7.9.1",
     "@sprintiq/shared-types": "1.0.0",
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "prisma": "^7.9.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

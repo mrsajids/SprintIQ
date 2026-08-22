@@ -33,6 +33,13 @@ app.get("/api/health", (_req, res) => {
     });
 });
 
+// Health check without prefix for simple uptime checks
+app.get("/health", (_req, res) => {
+    res.json({
+        status: "ok"
+    });
+});
+
 app.get("/api/tasks", (_req, res) => {
     res.json(tasks);
 });
@@ -62,4 +69,5 @@ app.post("/api/tasks", (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`API running on http://localhost:${PORT}`);
+    console.log(`Health endpoints: /health and /api/health`);
 });

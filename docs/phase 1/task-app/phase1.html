@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 1 — Task Index</title>
+<style>
+  :root {
+    --bg: #14171C;
+    --paper: #1C2028;
+    --ink: #E8EAED;
+    --ink-soft: #9AA1AD;
+    --line: #2B303B;
+    --accent: #33C9C4;
+    --accent-soft: rgba(51, 201, 196, 0.14);
+    --accent-border: rgba(51, 201, 196, 0.35);
+    --amber: #E7B24B;
+    --amber-soft: rgba(231, 178, 75, 0.14);
+    --amber-border: rgba(231, 178, 75, 0.35);
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  [data-theme="light"] {
+    --bg: #F2F3F6;
+    --paper: #FFFFFF;
+    --ink: #1B1E27;
+    --ink-soft: #5B606E;
+    --line: #E1E3E9;
+    --accent: #0E6E6E;
+    --accent-soft: #E4F2F1;
+    --accent-border: #BFE0DE;
+    --amber: #C7841B;
+    --amber-soft: #FBF0DE;
+    --amber-border: #ECD3A2;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; transition: background 0.2s ease, color 0.2s ease; }
+  .shell { max-width: 980px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  .masthead { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+  .masthead-text { flex: 1; min-width: 0; }
+  .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+  h1 { font-size: 26px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .goal { color: var(--ink-soft); font-size: 14.5px; line-height: 1.5; margin: 0 0 16px; max-width: 62ch; }
+
+  .theme-toggle { flex-shrink: 0; display: flex; align-items: center; gap: 6px; background: var(--paper); border: 1px solid var(--line); color: var(--ink); font-family: var(--sans); font-size: 12.5px; padding: 8px 12px; border-radius: 20px; cursor: pointer; }
+  .theme-toggle:hover { border-color: var(--accent); }
+
+  .progress-track { height: 6px; background: var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
+  .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
+  .progress-label { font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); }
+
+  .layout { display: grid; grid-template-columns: 250px 1fr; gap: 20px; margin-top: 24px; align-items: start; }
+
+  nav.index { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 6px; position: sticky; top: 20px; }
+  .idx-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: none; padding: 10px; border-radius: 7px; cursor: pointer; font-family: var(--sans); font-size: 13.5px; color: var(--ink); }
+  .idx-item:hover { background: var(--bg); }
+  .idx-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .idx-num { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); min-width: 20px; }
+  .idx-item.active .idx-num { color: var(--accent); }
+  .idx-title { flex: 1; }
+  .idx-badge { font-family: var(--mono); font-size: 10.5px; color: var(--ink-soft); background: var(--bg); border-radius: 20px; padding: 2px 7px; }
+  .idx-item.done .idx-badge { background: var(--accent); color: var(--bg); }
+  .idx-divider { height: 1px; background: var(--line); margin: 6px 4px; }
+  .idx-item.exit { color: var(--amber); }
+  .idx-item.exit .idx-num { color: var(--amber); }
+  .idx-item.exit.active { background: var(--amber-soft); color: var(--amber); }
+
+  main.detail { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 26px 28px; min-height: 320px; }
+  .detail-eyebrow { font-family: var(--mono); font-size: 12px; color: var(--accent); margin: 0 0 4px; }
+  .detail h2 { margin: 0 0 6px; font-size: 20px; }
+  .detail-hint { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 18px; }
+
+  ul.steps { list-style: none; padding: 0; margin: 0 0 22px; }
+  ul.steps > li { border-bottom: 1px solid var(--line); }
+  ul.steps > li:last-child { border-bottom: none; }
+
+  .step-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; }
+  .step-row input[type="checkbox"] { margin-top: 3px; width: 15px; height: 15px; accent-color: var(--accent); flex-shrink: 0; cursor: pointer; }
+
+  .step-toggle { flex: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; background: none; border: none; padding: 0; text-align: left; font-family: var(--sans); font-size: 14px; line-height: 1.5; color: var(--ink); cursor: pointer; }
+  .step-text { flex: 1; }
+  li.checked .step-text { color: var(--ink-soft); text-decoration: line-through; }
+
+  .chevron { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); flex-shrink: 0; transition: transform 0.15s ease; margin-top: 2px; }
+  li.expanded .chevron { transform: rotate(90deg); color: var(--accent); }
+
+  .step-detail { display: none; background: var(--bg); border-radius: 7px; padding: 12px 14px; margin: 0 0 12px 25px; font-size: 13px; line-height: 1.6; color: var(--ink-soft); }
+  li.expanded .step-detail { display: block; }
+
+  .checkpoint { background: var(--accent-soft); border: 1px solid var(--accent-border); border-radius: 8px; padding: 14px 16px; font-size: 13.5px; line-height: 1.5; }
+  .checkpoint strong { color: var(--accent); font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+  .detail.exit-panel .checkpoint { background: var(--amber-soft); border-color: var(--amber-border); }
+  .detail.exit-panel .checkpoint strong { color: var(--amber); }
+  .detail.exit-panel .step-row input[type="checkbox"] { accent-color: var(--amber); }
+  .detail.exit-panel li.expanded .chevron { color: var(--amber); }
+
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 1fr; }
+    .masthead { flex-direction: column; }
+    nav.index { position: static; display: flex; overflow-x: auto; gap: 4px; padding: 8px; }
+    .idx-item { flex-direction: column; align-items: center; gap: 4px; min-width: 64px; text-align: center; font-size: 11px; padding: 8px 6px; }
+    .idx-title { flex: none; white-space: nowrap; }
+    .idx-divider { display: none; }
+    main.detail { padding: 20px 18px; }
+    .step-detail { margin-left: 0; }
+  }
+
+  button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { .progress-fill, .chevron, body { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="masthead">
+    <div class="masthead-text">
+      <p class="kicker">AI Software Development Workspace — Phase 1</p>
+      <h1>Core Loop — Task Index</h1>
+      <p class="goal">Auth + Workspace + Project + Task + Sprint + a basic Kanban board, fully working end to end. No AI, no real-time yet — that's Phase 2 and 3.</p>
+    </div>
+    <button class="theme-toggle" id="themeToggle">🌙 Dark</button>
+  </div>
+
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <p class="progress-label" id="progressLabel">Loading progress…</p>
+
+  <div class="layout">
+    <nav class="index" id="indexNav"></nav>
+    <main class="detail" id="detailPanel"><p class="detail-hint">Loading your progress…</p></main>
+  </div>
+</div>
+
+<script>
+const milestones = [
+{ num:"01", title:"Setup", steps:[
+  {t:"Create folders: apps/web, apps/api, packages/shared-types", d:"This is your monorepo layout. apps/web is the React frontend, apps/api is the Node backend, packages/shared-types holds TS types both sides import (like what a Task object looks like) so frontend and backend never drift apart. Set up npm workspaces at the root so they can reference each other."},
+  {t:"Add docker-compose.yml with postgres + redis", d:"One file that runs Postgres and Redis as containers instead of installing them on your OS directly. Define two services with fixed ports, username/password, and a db name. This keeps your local setup identical to what you'll run in production later."},
+  {t:"Run docker-compose up, confirm both running", d:"Start the containers, then check Postgres is reachable (psql, or a GUI like TablePlus) and Redis responds (redis-cli ping should say PONG). Nothing is built yet — this just proves the environment works."},
+  {t:"Build basic Express + TS API with one route: GET /health", d:"Set up package.json + tsconfig + a src/index.ts entry file in apps/api. Add one route that returns { status: 'ok' }. Smallest possible proof that your backend project builds and runs."},
+  {t:"Build basic Vite + React + TS app (blank page is fine)", d:"Run npm create vite@latest in apps/web, choose React + TypeScript. Just get it rendering something — no real screens yet, this only proves your frontend toolchain works."}
+], checkpoint:"API responds on /health, frontend loads in browser."},
+
+{ num:"02", title:"Database", steps:[
+  {t:"Install Prisma in apps/api", d:"Prisma is an ORM — you describe tables as TS-friendly models in a schema file, and it generates the SQL plus a type-safe client for you, so you're not hand-writing raw SQL. Point its DATABASE_URL at the Postgres container from Milestone 1."},
+  {t:"Write schema: User, Workspace, WorkspaceMember, Project, Sprint, Task", d:"Six models. WorkspaceMember is the join table linking a User to a Workspace with a role — this is what makes multi-user, multi-workspace access work. Use the schema from the technical plan as-is for now."},
+  {t:"Run migration", d:"npx prisma migrate dev reads your schema and generates the actual SQL to create these tables, saving it as a versioned file in your repo — so the change is repeatable when you deploy or a teammate pulls the code."},
+  {t:"Check tables exist (Prisma Studio)", d:"npx prisma studio opens a free GUI over your database. Confirm all six tables exist with the columns you expect before moving on."}
+], checkpoint:"All 6 tables visible in the database."},
+
+{ num:"03", title:"Auth API", steps:[
+  {t:"POST /auth/register → hash password, save user", d:"Take email + password. Never store the raw password — hash it first with bcrypt, a one-way scramble: easy to check a match, effectively impossible to reverse. Save the User row with the hash."},
+  {t:"POST /auth/login → check password, return access + refresh token", d:"Verify the password against the stored hash. If it matches, issue an access token (short-lived JWT, ~15 min, sent with every request to prove identity) and a refresh token (longer-lived, stored hashed in Redis, used only to get a new access token without re-logging in)."},
+  {t:"POST /auth/refresh → give new access token", d:"When the access token expires, the frontend calls this with the refresh token. Server checks it against Redis — if valid, issues a fresh access token. This is what keeps someone logged in for days while the access token itself stays short-lived."},
+  {t:"Auth middleware → checks token on protected routes", d:"Runs before your protected routes: reads the access token, verifies it, attaches userId to the request so handlers know who's calling. Every route except register/login/refresh will use this."},
+  {t:"POST /auth/logout → delete refresh token", d:"Deletes the refresh token from Redis. Without this, a stolen refresh token would keep working even after the user 'logs out' on their end."}
+], checkpoint:"Register + login works via Postman. Protected route blocks without token."},
+
+{ num:"04", title:"Workspace API", steps:[
+  {t:"POST /workspaces → create workspace, creator becomes ADMIN", d:"Creates a Workspace row and a WorkspaceMember row linking the creator with role ADMIN in the same step — a workspace should never exist with zero members."},
+  {t:"GET /workspaces → list user's workspaces", d:"Returns every workspace the logged-in user (from the auth middleware's userId) belongs to."},
+  {t:"POST /workspaces/:id/invite → add existing user by email", d:"If a User with that email exists, add them as a WorkspaceMember. If not, return 404 for now — inviting someone without an account yet is a later feature, not required here."},
+  {t:"Add middleware: block access if user isn't a workspace member", d:"A reusable requireWorkspaceMember check that every workspace-scoped route from here on uses. This is what prevents one workspace's data becoming visible to a user from a different workspace — get this right, everything downstream depends on it."}
+], checkpoint:"2 users — one creates workspace, invites other, both can see it. 3rd user can't."},
+
+{ num:"05", title:"Project API", steps:[
+  {t:"POST /projects → create project in a workspace", d:"Creates a Project under a workspace, gated by requireWorkspaceMember from Milestone 4 — only members of that workspace can create projects in it."},
+  {t:"GET /workspaces/:id/projects → list projects", d:"Returns all projects in a workspace, same membership check applied."}
+], checkpoint:"Create + list project works via Postman."},
+
+{ num:"06", title:"Task API", steps:[
+  {t:"POST /projects/:id/tasks → create task", d:"Only title is required — everything else (description, priority, assignee, due date, points) is optional at creation, same as a real card starting sparse and getting filled in over time."},
+  {t:"GET /projects/:id/board → tasks grouped by status", d:"Returns all of a project's tasks pre-grouped by status (Backlog / To Do / In Progress / In Review / Done). This is the one call your Kanban UI needs to render the whole board."},
+  {t:"PATCH /tasks/:id → edit task / change status", d:"Updates any field, including status. This is exactly what 'dragging a card to a new column' will call later — the frontend just sends { status: 'IN_PROGRESS' }."}
+], checkpoint:"Create tasks, see them grouped on /board, change status, confirm it updates."},
+
+{ num:"07", title:"Sprint API", steps:[
+  {t:"POST /projects/:id/sprints → create sprint", d:"Creates a Sprint with a goal, start date, and end date under a project."},
+  {t:"PATCH /sprints/:id → edit sprint", d:"Lets you update sprint details after creation."},
+  {t:"PATCH /tasks/:id → also accept sprintId to assign task to sprint", d:"Extend the existing task update endpoint to accept sprintId too — no separate endpoint needed, assigning to a sprint is just another field update."}
+], checkpoint:"Create sprint, assign 2-3 tasks to it, confirm."},
+
+{ num:"08", title:"Frontend: Login & Workspace", steps:[
+  {t:"Login + Register pages", d:"Two forms wired to /auth/register and /auth/login. On success, store the access token (React state/memory is fine) and decide how the refresh token is handled — don't leave this unset."},
+  {t:"Store token, auto-refresh on expiry", d:"A fetch/axios wrapper that attaches the access token to every request, and on a 401 calls /auth/refresh once, then retries — so the rest of your app never has to think about token expiry."},
+  {t:"Workspace create + switch UI", d:"A form to create a workspace, and if the user belongs to more than one, a simple switcher (a dropdown is enough)."},
+  {t:"Project list + create UI", d:"Inside a selected workspace, show its projects and a form to create a new one."}
+], checkpoint:"Full signup → login → create workspace → create project, done through UI."},
+
+{ num:"09", title:"Frontend: Kanban Board", steps:[
+  {t:"Board page: show columns with tasks (no drag yet)", d:"Fetch /board and render columns as a plain list first. Deliberately skip drag-and-drop at this stage — get data flowing correctly before adding interaction on top."},
+  {t:"Create Task form", d:"A manual form (Title, Description, Priority, Assignee, Due Date...) wired to POST /tasks. This is the plain version — the AI-assisted 'type a sentence' version is Phase 2, not now."},
+  {t:"Task detail view (edit fields)", d:"Clicking a card opens a view to see/edit all its fields, wired to PATCH /tasks/:id."},
+  {t:"Add drag-and-drop between columns", d:"Use @dnd-kit to let cards be dragged between columns. On drop, call PATCH /tasks/:id with the new status — reusing the exact endpoint from Milestone 6."}
+], checkpoint:"Create task, drag across columns, refresh — status stays correct."},
+
+{ num:"10", title:"Frontend: Sprint UI", steps:[
+  {t:"Sprint create form", d:"Same pattern as project creation — a form wired to POST /sprints."},
+  {t:"Dropdown to assign task to sprint", d:"A dropdown on the task detail view to pick a sprint — no need for a dedicated drag-based planning screen yet."},
+  {t:"Filter board by sprint", d:"A toggle/dropdown on the board to show only the current sprint's tasks."}
+], checkpoint:"Create sprint, assign tasks, filter board, refresh — everything holds."},
+
+{ num:"✓", title:"Phase 1 Exit", exit:true, steps:[
+  {t:"2 users can sign up + log in", d:"Confirm this through the UI, not Postman — it's the real test of what you built in Milestones 3 and 8."},
+  {t:"One creates workspace, invites other", d:"The full Milestone 4 + 8 flow, done as a normal user would, start to finish."},
+  {t:"Both can create projects, tasks, move tasks on board", d:"Covers Milestones 5, 6, and 9 working together."},
+  {t:"Sprint can be created + tasks assigned", d:"Covers Milestone 7 and 10 together."},
+  {t:"Refresh keeps everything correct", d:"Hard refresh at any point in the walkthrough — if state doesn't hold, something's only working in memory, not actually persisted."}
+], checkpoint:"All of the above true in one continuous walkthrough → start Phase 2."}
+];
+
+const STORAGE_KEY = 'phase1-tracker-state';
+let appState = { theme: 'dark', progress: {} };
+let active = 0;
+
+const navEl = document.getElementById('indexNav');
+const detailEl = document.getElementById('detailPanel');
+const themeBtn = document.getElementById('themeToggle');
+
+function stepId(mi, si) { return 'm' + mi + 's' + si; }
+
+async function loadState() {
+  try {
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      const parsed = JSON.parse(savedState);
+      appState.theme = parsed.theme || 'dark';
+      appState.progress = parsed.progress || {};
+    }
+  } catch (e) {
+    // nothing saved yet — first visit, keep defaults
+  }
+}
+
+async function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+  } catch (e) {
+    console.error('Could not save progress:', e);
+  }
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', appState.theme);
+  themeBtn.textContent = appState.theme === 'dark' ? '🌙 Dark' : '☀️ Light';
+}
+
+themeBtn.addEventListener('click', () => {
+  appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+  applyTheme();
+  saveState();
+});
+
+function renderNav() {
+  navEl.innerHTML = '';
+  milestones.forEach((m, i) => {
+    if (i === milestones.length - 1) {
+      const div = document.createElement('div');
+      div.className = 'idx-divider';
+      navEl.appendChild(div);
+    }
+    const total = m.steps.length;
+    const doneCount = m.steps.filter((_, si) => !!appState.progress[stepId(i, si)]).length;
+
+    const btn = document.createElement('button');
+    btn.className = 'idx-item' + (i === active ? ' active' : '') + (doneCount === total ? ' done' : '') + (m.exit ? ' exit' : '');
+    btn.innerHTML = `<span class="idx-num">${m.num}</span><span class="idx-title">${m.title}</span><span class="idx-badge">${doneCount}/${total}</span>`;
+    btn.onclick = () => { active = i; renderNav(); renderDetail(); };
+    navEl.appendChild(btn);
+  });
+}
+
+function renderDetail() {
+  const m = milestones[active];
+  detailEl.className = 'detail' + (m.exit ? ' exit-panel' : '');
+  const stepsHtml = m.steps.map((s, si) => {
+    const id = stepId(active, si);
+    const isChecked = !!appState.progress[id];
+    return `<li id="li-${id}" class="${isChecked ? 'checked' : ''}">
+      <div class="step-row">
+        <input type="checkbox" id="${id}-cb" ${isChecked ? 'checked' : ''}>
+        <button class="step-toggle" id="${id}-tg"><span class="step-text">${s.t}</span><span class="chevron">›</span></button>
+      </div>
+      <div class="step-detail">${s.d}</div>
+    </li>`;
+  }).join('');
+
+  detailEl.innerHTML = `
+    <p class="detail-eyebrow">Milestone ${m.num}</p>
+    <h2>${m.title}</h2>
+    <p class="detail-hint">Tap a step to see what it means. Check it off once done — it's saved automatically.</p>
+    <ul class="steps">${stepsHtml}</ul>
+    <div class="checkpoint"><strong>${m.exit ? 'Exit Gate' : 'Checkpoint'}</strong>${m.checkpoint}</div>
+  `;
+
+  m.steps.forEach((_, si) => {
+    const id = stepId(active, si);
+    const cb = document.getElementById(id + '-cb');
+    const tg = document.getElementById(id + '-tg');
+    const li = document.getElementById('li-' + id);
+
+    cb.addEventListener('change', () => {
+      appState.progress[id] = cb.checked;
+      li.classList.toggle('checked', cb.checked);
+      renderNav();
+      updateProgress();
+      saveState();
+    });
+
+    tg.addEventListener('click', () => {
+      li.classList.toggle('expanded');
+    });
+  });
+}
+
+function updateProgress() {
+  let total = 0, done = 0;
+  milestones.forEach((m, mi) => {
+    m.steps.forEach((_, si) => {
+      total++;
+      if (appState.progress[stepId(mi, si)]) done++;
+    });
+  });
+  document.getElementById('progressFill').style.width = (total ? (done / total * 100) : 0) + '%';
+  document.getElementById('progressLabel').textContent = `${done} / ${total} steps done`;
+}
+
+async function init() {
+  await loadState();
+  applyTheme();
+  renderNav();
+  renderDetail();
+  updateProgress();
+}
+
+init();
+</script>
+
+</body>
+</html>
