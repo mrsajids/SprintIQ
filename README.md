@@ -6,7 +6,7 @@
 
 From **requirements and issues** to **sprints, documentation, code, and releases**, SprintIQ brings the tools software teams use every day into a single intelligent workspace.
 
-> **Plan smarter. Build faster. Ship better.**
+> **Plan smarter. Build faster. Ship better.** 
 
 ## ✨ Core Features
 
