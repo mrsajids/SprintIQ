@@ -1,0 +1,6 @@
+// Common (generic) components — buttons, inputs, modals, etc.
+// These are UI-only, stateless, and shared across features.
+// Example usage: import { Button } from '@/components/common'
+
+// shadcn/ui components added via `npx shadcn add <component>` will appear
+// at @/components/ui/ (as configured in components.json).

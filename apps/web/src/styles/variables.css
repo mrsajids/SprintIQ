@@ -1,0 +1,24 @@
+/* ─── Design tokens / CSS custom properties ─────────────────────────────────
+   Extend these variables as the design system evolves.
+   They are imported into globals.css automatically.
+──────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Brand */
+  --color-primary: #aa3bff;
+  --color-primary-light: rgba(170, 59, 255, 0.1);
+  --color-primary-border: rgba(170, 59, 255, 0.5);
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
