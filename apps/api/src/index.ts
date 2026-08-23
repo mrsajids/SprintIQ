@@ -1,9 +1,12 @@
+import "dotenv/config";
+
 import express from "express";
 import cors from "cors";
-import type {
-    Task,
-    CreateTaskRequest
-} from "@sprintiq/shared-types";
+
+import authRoutes from "./routes/auth.routes.js";
+import { authMiddleware } from "./middleware/auth.middleware.js";
+import { connectRedis } from "./lib/redis.js";
+import { connectPrisma } from "./lib/prisma.js";
 
 const app = express();
 
@@ -12,62 +15,52 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-const tasks: Task[] = [
-    {
-        id: "1",
-        title: "Learn React",
-        completed: false,
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: "2",
-        title: "Build SprintIQ API",
-        completed: false,
-        createdAt: new Date().toISOString()
-    }
-];
-
 app.get("/api/health", (_req, res) => {
     res.json({
-        status: "ok"
+        status: "ok",
     });
 });
 
-// Health check without prefix for simple uptime checks
-app.get("/health", (_req, res) => {
-    res.json({
-        status: "ok"
-    });
-});
+// Public auth routes
+app.use("/api/auth", authRoutes);
 
-app.get("/api/tasks", (_req, res) => {
-    res.json(tasks);
-});
-
-app.post("/api/tasks", (req, res) => {
-    const body = req.body as CreateTaskRequest;
-
-    if (!body.title || typeof body.title !== "string") {
-        res.status(400).json({
-            message: "Title is required"
+// Protected test route
+app.get(
+    "/api/protected",
+    authMiddleware,
+    (req, res) => {
+        res.json({
+            message:
+                "You accessed a protected route",
+            userId: req.userId,
         });
-
-        return;
     }
+);
 
-    const task: Task = {
-        id: crypto.randomUUID(),
-        title: body.title,
-        completed: false,
-        createdAt: new Date().toISOString()
-    };
+async function startServer() {
+    try {
+        console.log("[startup] Checking dependencies...");
+        await Promise.all([
+            connectRedis(),
+            connectPrisma(),
+        ]);
 
-    tasks.push(task);
+        app.listen(PORT, () => {
+            console.log(
+                `API running on http://localhost:${PORT}`
+            );
+            console.log(
+                `Health endpoint: /api/health`
+            );
+        });
+    } catch (error) {
+        console.error(
+            "Failed to start API:",
+            error
+        );
 
-    res.status(201).json(task);
-});
+        process.exit(1);
+    }
+}
 
-app.listen(PORT, () => {
-    console.log(`API running on http://localhost:${PORT}`);
-    console.log(`Health endpoints: /health and /api/health`);
-});
+startServer();
