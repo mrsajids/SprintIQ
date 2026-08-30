@@ -5,6 +5,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/auth.routes.js";
 import workspaceRoutes from "./routes/workspace.routes.js";
+import projectRoutes from "./routes/project.routes.js";
 import { authMiddleware } from "./middleware/auth.middleware.js";
 import { connectRedis } from "./lib/redis.js";
 import { connectPrisma } from "./lib/prisma.js";
@@ -28,6 +29,10 @@ app.use("/api/auth", authRoutes);
 // Workspace routes
 app.use("/api/workspaces", workspaceRoutes);
 app.use("/workspaces", workspaceRoutes);
+
+// Project routes
+app.use("/api/projects", projectRoutes);
+app.use("/projects", projectRoutes);
 
 // Protected test route
 app.get(

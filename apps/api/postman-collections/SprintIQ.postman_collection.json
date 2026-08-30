@@ -69,6 +69,14 @@
     {
       "key": "workspaceId",
       "value": ""
+    },
+    {
+      "key": "projectId",
+      "value": ""
+    },
+    {
+      "key": "project2Id",
+      "value": ""
     }
   ],
   "item": [
@@ -924,6 +932,704 @@
               ],
               "path": [
                 "workspaces"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Milestone 05 - Projects",
+      "description": "Project API integration tests for SprintIQ Milestone 05 (Create Project, List Workspace Projects, Membership Authorization).",
+      "item": [
+        {
+          "name": "01 - Setup - Register & Login User A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('userAToken', json.accessToken);",
+                  "}",
+                  "pm.test('User A login successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userAEmail}}\",\n  \"password\": \"{{userAPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "02 - Setup - Register & Login User B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('userBToken', json.accessToken);",
+                  "}",
+                  "pm.test('User B login successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userBEmail}}\",\n  \"password\": \"{{userBPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "03 - Setup - Register & Login User C",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('userCToken', json.accessToken);",
+                  "}",
+                  "pm.test('User C login successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userCEmail}}\",\n  \"password\": \"{{userCPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "04 - User A - Create Workspace A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.expect(pm.response.code).to.eql(201);",
+                  "});",
+                  "pm.test('Workspace ID returned and saved', function () {",
+                  "    pm.expect(json.id).to.be.a('string');",
+                  "    pm.collectionVariables.set('workspaceId', json.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SprintIQ Engineering\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/workspaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces"
+              ]
+            }
+          }
+        },
+        {
+          "name": "05 - User A - Create Project 1 in Workspace A (POST /projects)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.expect(pm.response.code).to.eql(201);",
+                  "});",
+                  "pm.test('Project created with correct fields', function () {",
+                  "    pm.expect(json.id).to.be.a('string');",
+                  "    pm.expect(json.name).to.eql('SprintIQ Web');",
+                  "    pm.expect(json.description).to.eql('SprintIQ frontend application');",
+                  "    pm.expect(json.workspaceId).to.eql(pm.collectionVariables.get('workspaceId'));",
+                  "    pm.expect(json.createdById).to.be.a('string');",
+                  "    pm.collectionVariables.set('projectId', json.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"workspaceId\": \"{{workspaceId}}\",\n  \"name\": \"SprintIQ Web\",\n  \"description\": \"SprintIQ frontend application\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "06 - User A - List Workspace A Projects (GET /workspaces/:id/projects)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const projectId = pm.collectionVariables.get('projectId');",
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "pm.test('Project 1 appears in workspace project list', function () {",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    const p = json.find(proj => proj.id === projectId);",
+                  "    pm.expect(p).to.not.be.undefined;",
+                  "    pm.expect(p.name).to.eql('SprintIQ Web');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/workspaces/{{workspaceId}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces",
+                "{{workspaceId}}",
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "07 - User B - List Projects Before Invite (403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403 Forbidden', function () {",
+                  "    pm.expect(pm.response.code).to.eql(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userBToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/workspaces/{{workspaceId}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces",
+                "{{workspaceId}}",
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08 - User B - Create Project Before Invite (403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403 Forbidden', function () {",
+                  "    pm.expect(pm.response.code).to.eql(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userBToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"workspaceId\": \"{{workspaceId}}\",\n  \"name\": \"Unauthorized Project\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "09 - User A - Invite User B to Workspace A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userBEmail}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/workspaces/{{workspaceId}}/invite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces",
+                "{{workspaceId}}",
+                "invite"
+              ]
+            }
+          }
+        },
+        {
+          "name": "10 - User B - List Projects After Invite (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const projectId = pm.collectionVariables.get('projectId');",
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "pm.test('User B can see workspace projects', function () {",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    const p = json.find(proj => proj.id === projectId);",
+                  "    pm.expect(p).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userBToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/workspaces/{{workspaceId}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces",
+                "{{workspaceId}}",
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11 - User B - Create Project 2 in Workspace A (POST /projects)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.expect(pm.response.code).to.eql(201);",
+                  "});",
+                  "pm.test('Project 2 created by User B', function () {",
+                  "    pm.expect(json.id).to.be.a('string');",
+                  "    pm.expect(json.name).to.eql('SprintIQ Mobile');",
+                  "    pm.collectionVariables.set('project2Id', json.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userBToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"workspaceId\": \"{{workspaceId}}\",\n  \"name\": \"SprintIQ Mobile\",\n  \"description\": \"SprintIQ mobile application\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12 - User C - List Projects (403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Status code is 403 Forbidden', function () {",
+                  "    pm.expect(pm.response.code).to.eql(403);",
+                  "});",
+                  "pm.test('Error message indicates non-membership', function () {",
+                  "    pm.expect(json.message).to.eql('You are not a member of this workspace');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userCToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/workspaces/{{workspaceId}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces",
+                "{{workspaceId}}",
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "13 - User C - Create Project (403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Status code is 403 Forbidden', function () {",
+                  "    pm.expect(pm.response.code).to.eql(403);",
+                  "});",
+                  "pm.test('Error message indicates non-membership', function () {",
+                  "    pm.expect(json.message).to.eql('You are not a member of this workspace');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userCToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"workspaceId\": \"{{workspaceId}}\",\n  \"name\": \"User C Project\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "14 - Unauthenticated - Create Project (401 Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401 Unauthorized', function () {",
+                  "    pm.expect(pm.response.code).to.eql(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"workspaceId\": \"{{workspaceId}}\",\n  \"name\": \"Unauth Project\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "15 - User A - Create Project Missing Name (400 Bad Request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 Bad Request', function () {",
+                  "    pm.expect(pm.response.code).to.eql(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"workspaceId\": \"{{workspaceId}}\",\n  \"name\": \"   \"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "16 - User A - Create Project Missing WorkspaceId (400 Bad Request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 Bad Request', function () {",
+                  "    pm.expect(pm.response.code).to.eql(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Missing WorkspaceId\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
               ]
             }
           }

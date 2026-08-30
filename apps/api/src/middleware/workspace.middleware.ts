@@ -24,12 +24,15 @@ export async function workspaceMemberMiddleware(
         });
     }
 
-    const rawWorkspaceId = req.params.id ?? req.params.workspaceId;
+    const rawWorkspaceId =
+        req.params.id ??
+        req.params.workspaceId ??
+        req.body?.workspaceId;
     const workspaceId = Array.isArray(rawWorkspaceId)
         ? rawWorkspaceId[0]
         : rawWorkspaceId;
 
-    if (!workspaceId || typeof workspaceId !== "string") {
+    if (!workspaceId || typeof workspaceId !== "string" || !workspaceId.trim()) {
         return res.status(400).json({
             message: "Workspace ID is required",
         });
