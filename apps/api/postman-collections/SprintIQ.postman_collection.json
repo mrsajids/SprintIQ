@@ -1,0 +1,934 @@
+{
+  "info": {
+    "_postman_id": "7a8b9c0d-1e2f-4a5b-9c8d-sprintiq-collection",
+    "name": "SprintIQ",
+    "description": "SprintIQ unified API test collection organized by milestone folders.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "name",
+      "value": "Sajeed"
+    },
+    {
+      "key": "email",
+      "value": "sajeed@example.com"
+    },
+    {
+      "key": "password",
+      "value": "Password@123"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    },
+    {
+      "key": "userAEmail",
+      "value": "userA@example.com"
+    },
+    {
+      "key": "userAPassword",
+      "value": "Password@123"
+    },
+    {
+      "key": "userAToken",
+      "value": ""
+    },
+    {
+      "key": "userBEmail",
+      "value": "userB@example.com"
+    },
+    {
+      "key": "userBPassword",
+      "value": "Password@123"
+    },
+    {
+      "key": "userBToken",
+      "value": ""
+    },
+    {
+      "key": "userCEmail",
+      "value": "userC@example.com"
+    },
+    {
+      "key": "userCPassword",
+      "value": "Password@123"
+    },
+    {
+      "key": "userCToken",
+      "value": ""
+    },
+    {
+      "key": "workspaceId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Milestone 03 - Authentication",
+      "description": "Authentication API tests for SprintIQ Milestone 03.",
+      "item": [
+        {
+          "name": "01 - Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{name}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "02 - Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "}",
+                  "",
+                  "if (json.refreshToken) {",
+                  "    pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "}",
+                  "",
+                  "pm.test('Login successful', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Access token returned', function () {",
+                  "    pm.expect(json.accessToken).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('Refresh token returned', function () {",
+                  "    pm.expect(json.refreshToken).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "03 - Protected Route - WITHOUT Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Request is unauthorized', function () {",
+                  "    pm.expect(pm.response.code).to.eql(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/protected",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "protected"
+              ]
+            }
+          }
+        },
+        {
+          "name": "04 - Protected Route - WITH Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('Request is successful', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('User ID returned', function () {",
+                  "    pm.expect(json.userId).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/protected",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "protected"
+              ]
+            }
+          }
+        },
+        {
+          "name": "05 - Refresh Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "}",
+                  "",
+                  "pm.test('Refresh successful', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('New access token returned', function () {",
+                  "    pm.expect(json.accessToken).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          }
+        },
+        {
+          "name": "06 - Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "07 - Refresh After Logout - SHOULD FAIL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Refresh token is invalidated', function () {",
+                  "    pm.expect(pm.response.code).to.eql(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Milestone 04 - Workspaces",
+      "description": "Workspace API integration tests for SprintIQ Milestone 04 (Create, List, Invite, Membership Authorization).",
+      "item": [
+        {
+          "name": "01 - Setup - Register & Login User A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('userAToken', json.accessToken);",
+                  "}",
+                  "pm.test('User A login successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userAEmail}}\",\n  \"password\": \"{{userAPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "02 - Setup - Register & Login User B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('userBToken', json.accessToken);",
+                  "}",
+                  "pm.test('User B login successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userBEmail}}\",\n  \"password\": \"{{userBPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "03 - Setup - Register & Login User C",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('userCToken', json.accessToken);",
+                  "}",
+                  "pm.test('User C login successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userCEmail}}\",\n  \"password\": \"{{userCPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "04 - User A - Create Workspace",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.expect(pm.response.code).to.eql(201);",
+                  "});",
+                  "pm.test('Workspace ID returned and saved', function () {",
+                  "    pm.expect(json.id).to.be.a('string');",
+                  "    pm.expect(json.name).to.eql('SprintIQ Engineering');",
+                  "    pm.collectionVariables.set('workspaceId', json.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SprintIQ Engineering\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/workspaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces"
+              ]
+            }
+          }
+        },
+        {
+          "name": "05 - User A - List Workspaces (Should have ADMIN role)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const workspaceId = pm.collectionVariables.get('workspaceId');",
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "pm.test('User A has workspace with ADMIN role', function () {",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    const ws = json.find(w => w.id === workspaceId);",
+                  "    pm.expect(ws).to.not.be.undefined;",
+                  "    pm.expect(ws.role).to.eql('ADMIN');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/workspaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces"
+              ]
+            }
+          }
+        },
+        {
+          "name": "06 - User B - List Workspaces (Should NOT see User A workspace)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const workspaceId = pm.collectionVariables.get('workspaceId');",
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "pm.test('User B cannot see Workspace A', function () {",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    const ws = json.find(w => w.id === workspaceId);",
+                  "    pm.expect(ws).to.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userBToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/workspaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces"
+              ]
+            }
+          }
+        },
+        {
+          "name": "07 - User A - Invite User B to Workspace",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "pm.test('User B added as MEMBER', function () {",
+                  "    pm.expect(json.member).to.not.be.undefined;",
+                  "    pm.expect(json.member.role).to.eql('MEMBER');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userBEmail}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/workspaces/{{workspaceId}}/invite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces",
+                "{{workspaceId}}",
+                "invite"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08 - User B - List Workspaces (Should now see Workspace with MEMBER role)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const workspaceId = pm.collectionVariables.get('workspaceId');",
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "pm.test('User B now has workspace with MEMBER role', function () {",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    const ws = json.find(w => w.id === workspaceId);",
+                  "    pm.expect(ws).to.not.be.undefined;",
+                  "    pm.expect(ws.role).to.eql('MEMBER');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userBToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/workspaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces"
+              ]
+            }
+          }
+        },
+        {
+          "name": "09 - User A - Invite User B Again (Duplicate -> 409 Conflict)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 409 Conflict', function () {",
+                  "    pm.expect(pm.response.code).to.eql(409);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userBEmail}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/workspaces/{{workspaceId}}/invite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces",
+                "{{workspaceId}}",
+                "invite"
+              ]
+            }
+          }
+        },
+        {
+          "name": "10 - User A - Invite Non-existent User (404 Not Found)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 Not Found', function () {",
+                  "    pm.expect(pm.response.code).to.eql(404);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nonexistent-user-999@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/workspaces/{{workspaceId}}/invite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces",
+                "{{workspaceId}}",
+                "invite"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11 - User C - Attempt Invite on Workspace A (403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Status code is 403 Forbidden', function () {",
+                  "    pm.expect(pm.response.code).to.eql(403);",
+                  "});",
+                  "pm.test('Error message indicates non-membership', function () {",
+                  "    pm.expect(json.message).to.eql('You are not a member of this workspace');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userCToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"userB@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/workspaces/{{workspaceId}}/invite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces",
+                "{{workspaceId}}",
+                "invite"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12 - Unauthenticated - Create Workspace (401 Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401 Unauthorized', function () {",
+                  "    pm.expect(pm.response.code).to.eql(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Unauthorized Workspace\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/workspaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces"
+              ]
+            }
+          }
+        },
+        {
+          "name": "13 - User A - Create Workspace with Empty Name (400 Bad Request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 Bad Request', function () {",
+                  "    pm.expect(pm.response.code).to.eql(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userAToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"   \"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/workspaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "workspaces"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

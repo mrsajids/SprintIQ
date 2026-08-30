@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 
 import authRoutes from "./routes/auth.routes.js";
+import workspaceRoutes from "./routes/workspace.routes.js";
 import { authMiddleware } from "./middleware/auth.middleware.js";
 import { connectRedis } from "./lib/redis.js";
 import { connectPrisma } from "./lib/prisma.js";
@@ -23,6 +24,10 @@ app.get("/api/health", (_req, res) => {
 
 // Public auth routes
 app.use("/api/auth", authRoutes);
+
+// Workspace routes
+app.use("/api/workspaces", workspaceRoutes);
+app.use("/workspaces", workspaceRoutes);
 
 // Protected test route
 app.get(
