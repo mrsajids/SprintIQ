@@ -1,0 +1,631 @@
+{
+  "info": {
+    "_postman_id": "8f9e0a1b-2c3d-4e5f-6a7b-sprintiq-m06-tasks",
+    "name": "SprintIQ - Milestone 06 - Task API",
+    "description": "Task API tests for SprintIQ Milestone 06 (Create Task, Get Project Board, Update Task, Workspace Authorization, and Validation).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "userAEmail",
+      "value": "usera@example.com"
+    },
+    {
+      "key": "userAPassword",
+      "value": "Password@123"
+    },
+    {
+      "key": "userAToken",
+      "value": ""
+    },
+    {
+      "key": "userBEmail",
+      "value": "userb@example.com"
+    },
+    {
+      "key": "userBPassword",
+      "value": "Password@123"
+    },
+    {
+      "key": "userBToken",
+      "value": ""
+    },
+    {
+      "key": "userCEmail",
+      "value": "userc@example.com"
+    },
+    {
+      "key": "userCPassword",
+      "value": "Password@123"
+    },
+    {
+      "key": "userCToken",
+      "value": ""
+    },
+    {
+      "key": "workspaceId",
+      "value": ""
+    },
+    {
+      "key": "projectId",
+      "value": ""
+    },
+    {
+      "key": "taskId",
+      "value": ""
+    },
+    {
+      "key": "task2Id",
+      "value": ""
+    },
+    {
+      "key": "task3Id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Setup: Login User A",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.accessToken) {",
+              "    pm.collectionVariables.set('userAToken', json.accessToken);",
+              "}",
+              "pm.test('Login User A successful', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{userAEmail}}\",\n  \"password\": \"{{userAPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "01 - User A - Create Task 1 (TODO)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.id) {",
+              "    pm.collectionVariables.set('taskId', json.id);",
+              "}",
+              "pm.test('Status code is 201 Created', function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "});",
+              "pm.test('Default status is TODO', function () {",
+              "    pm.expect(json.status).to.eql('TODO');",
+              "});",
+              "pm.test('Has required fields', function () {",
+              "    pm.expect(json.title).to.eql('Create Kanban board');",
+              "    pm.expect(json.projectId).to.eql(pm.collectionVariables.get('projectId'));",
+              "    pm.expect(json.createdById).to.be.a('string');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Create Kanban board\",\n  \"description\": \"Implement the initial board API\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectId}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectId}}", "tasks"]
+        }
+      }
+    },
+    {
+      "name": "02 - User A - Create Task 2 (TODO)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.id) {",
+              "    pm.collectionVariables.set('task2Id', json.id);",
+              "}",
+              "pm.test('Status code is 201 Created', function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "});",
+              "pm.test('Default status is TODO', function () {",
+              "    pm.expect(json.status).to.eql('TODO');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Build UI\",\n  \"description\": \"Frontend Kanban UI\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectId}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectId}}", "tasks"]
+        }
+      }
+    },
+    {
+      "name": "03 - User B - Create Task 3 (TODO)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.id) {",
+              "    pm.collectionVariables.set('task3Id', json.id);",
+              "}",
+              "pm.test('Status code is 201 Created', function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "});",
+              "pm.test('Default status is TODO', function () {",
+              "    pm.expect(json.status).to.eql('TODO');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userBToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Setup database\",\n  \"description\": \"Postgres migrations\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectId}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectId}}", "tasks"]
+        }
+      }
+    },
+    {
+      "name": "04 - User A - Get Project Board",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "pm.test('All four status columns exist', function () {",
+              "    pm.expect(json.TODO).to.be.an('array');",
+              "    pm.expect(json.IN_PROGRESS).to.be.an('array');",
+              "    pm.expect(json.IN_REVIEW).to.be.an('array');",
+              "    pm.expect(json.DONE).to.be.an('array');",
+              "});",
+              "pm.test('Tasks are in TODO column', function () {",
+              "    pm.expect(json.TODO.length).to.be.at.least(3);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectId}}/board",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectId}}", "board"]
+        }
+      }
+    },
+    {
+      "name": "05 - User A - Update Task 1 Status to IN_PROGRESS",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "pm.test('Status is now IN_PROGRESS', function () {",
+              "    pm.expect(json.status).to.eql('IN_PROGRESS');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"IN_PROGRESS\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{taskId}}"]
+        }
+      }
+    },
+    {
+      "name": "06 - User B - Verify Board Reflects IN_PROGRESS",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "pm.test('Task 1 is in IN_PROGRESS column', function () {",
+              "    const inProgressIds = json.IN_PROGRESS.map(t => t.id);",
+              "    pm.expect(inProgressIds).to.include(pm.collectionVariables.get('taskId'));",
+              "});",
+              "pm.test('Task 1 is NOT in TODO column', function () {",
+              "    const todoIds = json.TODO.map(t => t.id);",
+              "    pm.expect(todoIds).to.not.include(pm.collectionVariables.get('taskId'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{userBToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectId}}/board",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectId}}", "board"]
+        }
+      }
+    },
+    {
+      "name": "07 - User B - Update Task 1 Status to IN_REVIEW",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "pm.test('Status is now IN_REVIEW', function () {",
+              "    pm.expect(json.status).to.eql('IN_REVIEW');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userBToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"IN_REVIEW\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{taskId}}"]
+        }
+      }
+    },
+    {
+      "name": "08 - User A - Update Task 1 to DONE with Title and Description",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "pm.test('Task is DONE and fields updated', function () {",
+              "    pm.expect(json.status).to.eql('DONE');",
+              "    pm.expect(json.title).to.eql('Create Kanban board (Completed)');",
+              "    pm.expect(json.description).to.eql('Updated description');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Create Kanban board (Completed)\",\n  \"description\": \"Updated description\",\n  \"status\": \"DONE\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{taskId}}"]
+        }
+      }
+    },
+    {
+      "name": "09 - User C (Non-member) - Create Task (403 Forbidden)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 403 Forbidden', function () {",
+              "    pm.expect(pm.response.code).to.eql(403);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userCToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Unauthorized task\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectId}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectId}}", "tasks"]
+        }
+      }
+    },
+    {
+      "name": "10 - User C (Non-member) - Get Project Board (403 Forbidden)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 403 Forbidden', function () {",
+              "    pm.expect(pm.response.code).to.eql(403);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{userCToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectId}}/board",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectId}}", "board"]
+        }
+      }
+    },
+    {
+      "name": "11 - User C (Non-member) - Update Task (403 Forbidden)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 403 Forbidden', function () {",
+              "    pm.expect(pm.response.code).to.eql(403);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userCToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"TODO\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{taskId}}"]
+        }
+      }
+    },
+    {
+      "name": "12 - User A - Create Task Missing Title (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400 Bad Request', function () {",
+              "    pm.expect(pm.response.code).to.eql(400);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"   \"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectId}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectId}}", "tasks"]
+        }
+      }
+    },
+    {
+      "name": "13 - User A - Update Task Invalid Status (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400 Bad Request', function () {",
+              "    pm.expect(pm.response.code).to.eql(400);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"INVALID_STATUS\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{taskId}}"]
+        }
+      }
+    },
+    {
+      "name": "14 - User A - Create Task in Non-existent Project (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 404 Not Found', function () {",
+              "    pm.expect(pm.response.code).to.eql(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Non-existent project task\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/projects/nonexistentproject123/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "nonexistentproject123", "tasks"]
+        }
+      }
+    },
+    {
+      "name": "15 - User A - Update Non-existent Task (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 404 Not Found', function () {",
+              "    pm.expect(pm.response.code).to.eql(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"DONE\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/nonexistenttask123",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "nonexistenttask123"]
+        }
+      }
+    }
+  ]
+}
