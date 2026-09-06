@@ -30,7 +30,7 @@ jobs:
         run: npm ci
 
       - name: Generate Prisma Client
-        run: npx prisma generate
+        run: npx prisma generate --schema=apps/api/prisma/schema.prisma
 
       - name: Lint Web
         run: npm run lint --workspace=web
