@@ -124,12 +124,13 @@ export async function update(req: Request, res: Response) {
             });
         }
 
-        const { title, description, status } = req.body;
+        const { title, description, status, sprintId } = req.body;
 
         const task = await updateTask(userId, taskId.trim(), {
             title,
             description,
             status,
+            sprintId,
         });
 
         return res.status(200).json(task);
@@ -137,14 +138,16 @@ export async function update(req: Request, res: Response) {
         if (error instanceof Error) {
             if (
                 error.message === "Title must not be empty" ||
-                error.message === "Invalid task status"
+                error.message === "Invalid task status" ||
+                error.message === "Invalid sprint ID format" ||
+                error.message === "Sprint does not belong to the same project as the task"
             ) {
                 return res.status(400).json({
                     message: error.message,
                 });
             }
 
-            if (error.message === "Task not found") {
+            if (error.message === "Task not found" || error.message === "Sprint not found") {
                 return res.status(404).json({
                     message: error.message,
                 });

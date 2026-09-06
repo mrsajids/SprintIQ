@@ -10,6 +10,7 @@ export interface UpdateTaskInput {
     title?: string;
     description?: string | null;
     status?: TaskStatus;
+    sprintId?: string | null;
 }
 
 const VALID_STATUSES: Set<TaskStatus> = new Set([
@@ -145,6 +146,7 @@ export async function updateTask(
         title?: string;
         description?: string | null;
         status?: TaskStatus;
+        sprintId?: string | null;
     } = {};
 
     if (input.title !== undefined) {
@@ -168,6 +170,34 @@ export async function updateTask(
             throw new Error("Invalid task status");
         }
         data.status = input.status;
+    }
+
+    if (input.sprintId !== undefined) {
+        if (input.sprintId === null) {
+            data.sprintId = null;
+        } else if (typeof input.sprintId === "string") {
+            const sprintIdTrimmed = input.sprintId.trim();
+            if (!sprintIdTrimmed) {
+                data.sprintId = null;
+            } else {
+                const sprint = await prisma.sprint.findUnique({
+                    where: { id: sprintIdTrimmed },
+                    select: { id: true, projectId: true },
+                });
+
+                if (!sprint) {
+                    throw new Error("Sprint not found");
+                }
+
+                if (sprint.projectId !== task.project.id) {
+                    throw new Error("Sprint does not belong to the same project as the task");
+                }
+
+                data.sprintId = sprint.id;
+            }
+        } else {
+            throw new Error("Invalid sprint ID format");
+        }
     }
 
     const updatedTask = await prisma.task.update({

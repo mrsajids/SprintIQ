@@ -1,0 +1,492 @@
+{
+  "info": {
+    "_postman_id": "9a0b1c2d-3e4f-5a6b-7c8d-sprintiq-m07-sprints",
+    "name": "SprintIQ - Milestone 07 - Sprint API",
+    "description": "Sprint API tests for SprintIQ Milestone 07 (Create Sprint, Update Sprint, Task Sprint Assignment, Task Sprint Removal, Cross-Project Assignment Rejection, and Authorization).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "userAEmail",
+      "value": "usera@example.com"
+    },
+    {
+      "key": "userAPassword",
+      "value": "Password@123"
+    },
+    {
+      "key": "userAToken",
+      "value": ""
+    },
+    {
+      "key": "userBEmail",
+      "value": "userb@example.com"
+    },
+    {
+      "key": "userBPassword",
+      "value": "Password@123"
+    },
+    {
+      "key": "userBToken",
+      "value": ""
+    },
+    {
+      "key": "userCEmail",
+      "value": "userc@example.com"
+    },
+    {
+      "key": "userCPassword",
+      "value": "Password@123"
+    },
+    {
+      "key": "userCToken",
+      "value": ""
+    },
+    {
+      "key": "workspaceId",
+      "value": ""
+    },
+    {
+      "key": "projectAId",
+      "value": ""
+    },
+    {
+      "key": "projectBId",
+      "value": ""
+    },
+    {
+      "key": "sprintAId",
+      "value": ""
+    },
+    {
+      "key": "taskAId",
+      "value": ""
+    },
+    {
+      "key": "taskBId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Setup: Login User A",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.accessToken) {",
+              "    pm.collectionVariables.set('userAToken', json.accessToken);",
+              "}",
+              "pm.test('Login User A successful', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{userAEmail}}\",\n  \"password\": \"{{userAPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "01 - User A - Create Sprint (PLANNED)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.id) {",
+              "    pm.collectionVariables.set('sprintAId', json.id);",
+              "}",
+              "pm.test('Status code is 201 Created', function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "});",
+              "pm.test('Default status is PLANNED', function () {",
+              "    pm.expect(json.status).to.eql('PLANNED');",
+              "});",
+              "pm.test('Belongs to Project A', function () {",
+              "    pm.expect(json.projectId).to.eql(pm.collectionVariables.get('projectAId'));",
+              "    pm.expect(json.name).to.eql('Sprint 1');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Sprint 1\",\n  \"goal\": \"Complete core platform\",\n  \"startDate\": \"2026-09-07T00:00:00.000Z\",\n  \"endDate\": \"2026-09-20T23:59:59.999Z\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectAId}}/sprints",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectAId}}", "sprints"]
+        }
+      }
+    },
+    {
+      "name": "02 - User A - Update Sprint to ACTIVE, Name, and Goal",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "pm.test('Sprint fields updated', function () {",
+              "    pm.expect(json.status).to.eql('ACTIVE');",
+              "    pm.expect(json.name).to.eql('Sprint 1 — Core Platform');",
+              "    pm.expect(json.goal).to.eql('Finish core platform APIs');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Sprint 1 — Core Platform\",\n  \"goal\": \"Finish core platform APIs\",\n  \"status\": \"ACTIVE\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sprints/{{sprintAId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["sprints", "{{sprintAId}}"]
+        }
+      }
+    },
+    {
+      "name": "03 - User A - Assign Task to Sprint",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "pm.test('Task assigned to Sprint A', function () {",
+              "    pm.expect(json.sprintId).to.eql(pm.collectionVariables.get('sprintAId'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sprintId\": \"{{sprintAId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskAId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{taskAId}}"]
+        }
+      }
+    },
+    {
+      "name": "04 - User A - Remove Task from Sprint",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "pm.test('sprintId is now null', function () {",
+              "    pm.expect(json.sprintId).to.be.null;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sprintId\": null\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskAId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{taskAId}}"]
+        }
+      }
+    },
+    {
+      "name": "05 - User A - Reject Cross-Project Sprint Assignment (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400 Bad Request', function () {",
+              "    pm.expect(pm.response.code).to.eql(400);",
+              "});",
+              "pm.test('Cross-project error message', function () {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.message).to.eql('Sprint does not belong to the same project as the task');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sprintId\": \"{{sprintAId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskBId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{taskBId}}"]
+        }
+      }
+    },
+    {
+      "name": "06 - User C (Non-member) - Create Sprint (403 Forbidden)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 403 Forbidden', function () {",
+              "    pm.expect(pm.response.code).to.eql(403);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userCToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Unauthorized Sprint\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectAId}}/sprints",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectAId}}", "sprints"]
+        }
+      }
+    },
+    {
+      "name": "07 - User C (Non-member) - Update Sprint (403 Forbidden)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 403 Forbidden', function () {",
+              "    pm.expect(pm.response.code).to.eql(403);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userCToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"COMPLETED\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sprints/{{sprintAId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["sprints", "{{sprintAId}}"]
+        }
+      }
+    },
+    {
+      "name": "08 - User A - Reject Invalid Sprint Status (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400 Bad Request', function () {",
+              "    pm.expect(pm.response.code).to.eql(400);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"INVALID_STATUS\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sprints/{{sprintAId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["sprints", "{{sprintAId}}"]
+        }
+      }
+    },
+    {
+      "name": "09 - User A - Reject Invalid Date Range (400 Bad Request)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400 Bad Request', function () {",
+              "    pm.expect(pm.response.code).to.eql(400);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Invalid Dates Sprint\",\n  \"startDate\": \"2026-09-20T00:00:00.000Z\",\n  \"endDate\": \"2026-09-10T00:00:00.000Z\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/projects/{{projectAId}}/sprints",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "{{projectAId}}", "sprints"]
+        }
+      }
+    },
+    {
+      "name": "10 - User A - Non-Existent Project (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 404 Not Found', function () {",
+              "    pm.expect(pm.response.code).to.eql(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Sprint on missing project\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/projects/nonexistentproject123/sprints",
+          "host": ["{{baseUrl}}"],
+          "path": ["projects", "nonexistentproject123", "sprints"]
+        }
+      }
+    },
+    {
+      "name": "11 - User A - Non-Existent Sprint (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 404 Not Found', function () {",
+              "    pm.expect(pm.response.code).to.eql(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userAToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"COMPLETED\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sprints/nonexistentsprint123",
+          "host": ["{{baseUrl}}"],
+          "path": ["sprints", "nonexistentsprint123"]
+        }
+      }
+    }
+  ]
+}
