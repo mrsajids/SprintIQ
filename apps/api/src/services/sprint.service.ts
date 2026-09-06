@@ -1,21 +1,11 @@
 import prisma from "../lib/prisma.js";
-import { SprintStatus } from "../generated/prisma/client.js";
+import {
+    SprintStatus,
+    type CreateSprintInput,
+    type UpdateSprintInput,
+} from "@sprintiq/shared-types";
 
-export interface CreateSprintInput {
-    name: string;
-    goal?: string | null;
-    status?: SprintStatus;
-    startDate?: string | Date | null;
-    endDate?: string | Date | null;
-}
-
-export interface UpdateSprintInput {
-    name?: string;
-    goal?: string | null;
-    status?: SprintStatus;
-    startDate?: string | Date | null;
-    endDate?: string | Date | null;
-}
+export type { CreateSprintInput, UpdateSprintInput };
 
 const VALID_SPRINT_STATUSES: Set<SprintStatus> = new Set([
     SprintStatus.PLANNED,

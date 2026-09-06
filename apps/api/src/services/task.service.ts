@@ -1,17 +1,12 @@
 import prisma from "../lib/prisma.js";
-import { TaskStatus } from "../generated/prisma/client.js";
+import {
+    TaskStatus,
+    type CreateTaskInput,
+    type UpdateTaskInput,
+    type ProjectBoard,
+} from "@sprintiq/shared-types";
 
-export interface CreateTaskInput {
-    title: string;
-    description?: string | null;
-}
-
-export interface UpdateTaskInput {
-    title?: string;
-    description?: string | null;
-    status?: TaskStatus;
-    sprintId?: string | null;
-}
+export type { CreateTaskInput, UpdateTaskInput, ProjectBoard };
 
 const VALID_STATUSES: Set<TaskStatus> = new Set([
     TaskStatus.TODO,
@@ -92,7 +87,7 @@ export async function getProjectBoard(userId: string, projectId: string) {
         },
     });
 
-    const board: Record<TaskStatus, typeof tasks> = {
+    const board: ProjectBoard = {
         [TaskStatus.TODO]: [],
         [TaskStatus.IN_PROGRESS]: [],
         [TaskStatus.IN_REVIEW]: [],
@@ -100,8 +95,9 @@ export async function getProjectBoard(userId: string, projectId: string) {
     };
 
     for (const task of tasks) {
-        if (board[task.status]) {
-            board[task.status].push(task);
+        const status = task.status as TaskStatus;
+        if (board[status]) {
+            board[status].push(task as any);
         }
     }
 

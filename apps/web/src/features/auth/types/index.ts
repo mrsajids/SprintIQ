@@ -1,48 +1,28 @@
-// Auth feature — TypeScript types matching API specification.
+// Auth feature types — imports shared types from @sprintiq/shared-types
+import type {
+  AuthUser,
+  RegisterPayload,
+  RegisterResponse,
+  LoginPayload,
+  LoginResponse,
+  RefreshResponse,
+  ProtectedResponse,
+  AuthTokens,
+} from '@sprintiq/shared-types'
 
-export interface AuthUser {
-  id: string
-  name: string
-  email: string
-  createdAt?: string
+// Re-export shared types
+export type {
+  AuthUser,
+  RegisterPayload,
+  RegisterResponse,
+  LoginPayload,
+  LoginResponse,
+  RefreshResponse,
+  ProtectedResponse,
+  AuthTokens,
 }
 
-export interface RegisterPayload {
-  name: string
-  email: string
-  password: string
-}
-
-export interface RegisterResponse {
-  message: string
-  user: AuthUser
-}
-
-export interface LoginPayload {
-  email: string
-  password: string
-}
-
-export interface LoginResponse {
-  user: AuthUser
-  accessToken: string
-  refreshToken: string
-}
-
-export interface RefreshResponse {
-  accessToken: string
-}
-
-export interface ProtectedResponse {
-  message: string
-  userId: string
-}
-
-export interface AuthTokens {
-  accessToken: string
-  refreshToken: string
-}
-
+// Local Auth Context type for React state
 export interface AuthContextType {
   user: AuthUser | null
   accessToken: string | null

@@ -1,10 +1,7 @@
 import prisma from "../lib/prisma.js";
+import type { CreateProjectInput } from "@sprintiq/shared-types";
 
-export interface CreateProjectInput {
-    workspaceId: string;
-    name: string;
-    description?: string | null;
-}
+export type { CreateProjectInput };
 
 export async function createProject(
     userId: string,
