@@ -1,7 +1,7 @@
 # 🚀 SprintIQ
 
 ### AI-powered project management for software teams.
-
+ 
 **SprintIQ** is a modern, AI-powered software development workspace designed to help engineering teams manage the entire software delivery lifecycle in one place.
 
 From **requirements and issues** to **sprints, documentation, code, and releases**, SprintIQ brings the tools software teams use every day into a single intelligent workspace.
