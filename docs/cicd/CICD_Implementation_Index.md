@@ -97,7 +97,7 @@ SprintIQ/
 - [ ] Rollback
 - [ ] Deployment Failure Handling
 
-## PHASE 9 — Final CI/CD Pipeline
+## PHASE 9 — Final CI/CD Pipeline 
 
 - [ ] Pull Request → CI
 - [ ] Merge → Build
