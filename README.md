@@ -41,7 +41,7 @@ This project is being built as a production-style SaaS portfolio project, with a
 * **Backend:** Node.js
 * **Database:** Postgres
 * **AI:** Open AI Api
-* **Deployment:** will come soon
+* **Deployment:** will come soon!
 
 ## 📌 Why SprintIQ?
 
