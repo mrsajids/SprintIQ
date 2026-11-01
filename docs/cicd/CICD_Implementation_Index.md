@@ -4,6 +4,8 @@
 
 This document tracks the implementation of CI/CD for the SprintIQ monorepo.
 
+> 💡 **Interactive Tracker**: An interactive HTML tracker with progress tracking and localStorage persistence is available at [`cicd_tracker.html`](./cicd_tracker.html).
+
 ### SprintIQ Architecture
 
 ```text
@@ -134,7 +136,7 @@ GitHub Actions
   Production Server
          │
          ▼
-   Docker Compose
+    Docker Compose
          │
     ┌────┴────┐
     ▼         ▼

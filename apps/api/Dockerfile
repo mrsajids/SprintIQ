@@ -43,6 +43,10 @@ RUN npm ci --omit=dev
 # Copy compiled API
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 
+# Copy Prisma configuration and migrations
+COPY --from=builder /app/apps/api/prisma.config.ts ./apps/api/prisma.config.ts
+COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
+
 # Copy shared package if required at runtime
 COPY --from=builder /app/packages/shared-types ./packages/shared-types
 

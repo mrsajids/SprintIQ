@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SprintIQ — CI/CD Implementation Tracker</title>
+  <style>
+    :root {
+      --bg: #0F1318;
+      --paper: #171B22;
+      --paper-card: #1F242D;
+      --paper-hover: #262D38;
+      --ink: #EDF0F5;
+      --ink-soft: #9BA3AF;
+      --ink-faint: #606877;
+      --line: #2B323F;
+      --line-faint: #1D232C;
+      --accent: #33C9C4;
+      --accent-soft: rgba(51, 201, 196, 0.12);
+      --accent-border: rgba(51, 201, 196, 0.35);
+      --green: #10B981;
+      --green-soft: rgba(16, 185, 129, 0.14);
+      --green-border: rgba(16, 185, 129, 0.35);
+      --amber: #F59E0B;
+      --amber-soft: rgba(245, 158, 11, 0.14);
+      --amber-border: rgba(245, 158, 11, 0.35);
+      --blue: #3B82F6;
+      --blue-soft: rgba(59, 130, 246, 0.14);
+      --purple: #8B5CF6;
+      --purple-soft: rgba(139, 92, 246, 0.14);
+      --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    [data-theme="light"] {
+      --bg: #F4F6F9;
+      --paper: #FFFFFF;
+      --paper-card: #F8FAFC;
+      --paper-hover: #F1F5F9;
+      --ink: #111827;
+      --ink-soft: #4B5563;
+      --ink-faint: #9CA3AF;
+      --line: #E2E8F0;
+      --line-faint: #EDF2F7;
+      --accent: #0D9488;
+      --accent-soft: #E6FFFA;
+      --accent-border: #99F6E4;
+      --green: #059669;
+      --green-soft: #ECFDF5;
+      --green-border: #A7F3D0;
+      --amber: #D97706;
+      --amber-soft: #FFFBEB;
+      --amber-border: #FDE68A;
+      --blue: #2563EB;
+      --blue-soft: #EFF6FF;
+      --purple: #7C3AED;
+      --purple-soft: #F5F3FF;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.2s ease, color 0.2s ease;
+      line-height: 1.5;
+    }
+
+    .shell {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    /* Header & Masthead */
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .masthead-text {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .badge-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      padding: 3px 9px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .goal {
+      color: var(--ink-soft);
+      font-size: 14.5px;
+      margin: 0;
+      max-width: 72ch;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      background: var(--paper-hover);
+      color: var(--accent);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0F1318;
+      font-weight: 600;
+    }
+
+    .btn-accent:hover {
+      filter: brightness(1.1);
+      color: #0F1318;
+    }
+
+    /* Progress Card */
+    .progress-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    .progress-title {
+      font-weight: 600;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .progress-stats {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .progress-track {
+      height: 8px;
+      background: var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      width: 0%;
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Filter & Search Bar */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 13.5px;
+      padding: 8px 12px 8px 34px;
+      border-radius: 8px;
+      outline: none;
+      transition: border 0.15s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-faint);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      padding: 3px;
+      border-radius: 8px;
+    }
+
+    .pill-btn {
+      background: none;
+      border: none;
+      color: var(--ink-soft);
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .pill-btn.active {
+      background: var(--paper-hover);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Two Column Layout */
+    .layout {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Navigation Sidebar */
+    nav.index {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px;
+      position: sticky;
+      top: 24px;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
+
+    .nav-header {
+      padding: 8px 10px 12px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .idx-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 9px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--ink);
+      transition: all 0.15s ease;
+      margin-bottom: 2px;
+    }
+
+    .idx-item:hover {
+      background: var(--paper-hover);
+    }
+
+    .idx-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .idx-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-faint);
+      min-width: 22px;
+    }
+
+    .idx-item.active .idx-num {
+      color: var(--accent);
+    }
+
+    .idx-title {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .idx-badge {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--ink-soft);
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 2px 7px;
+    }
+
+    .idx-item.done .idx-badge {
+      background: var(--green);
+      color: #0F1318;
+      font-weight: 600;
+    }
+
+    .idx-item.exit {
+      color: var(--amber);
+    }
+
+    .idx-item.exit .idx-num {
+      color: var(--amber);
+    }
+
+    .idx-item.exit.active {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .idx-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 8px 6px;
+    }
+
+    /* Main Detail Panel */
+    main.detail {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 28px 32px;
+      min-height: 480px;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+
+    .detail-title-group {
+      flex: 1;
+    }
+
+    .detail-eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      margin: 0 0 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .detail h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .detail-hint {
+      font-size: 13px;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .phase-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn-sm {
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+
+    /* Step Checklist */
+    ul.steps {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px;
+    }
+
+    ul.steps>li {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: var(--paper-card);
+      transition: all 0.15s ease;
+      overflow: hidden;
+    }
+
+    ul.steps>li:hover {
+      border-color: var(--line-faint);
+      background: var(--paper-hover);
+    }
+
+    ul.steps>li.checked {
+      opacity: 0.85;
+      background: var(--paper);
+      border-color: var(--line);
+    }
+
+    ul.steps>li.checked .step-text {
+      text-decoration: line-through;
+      color: var(--ink-soft);
+    }
+
+    .step-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+    }
+
+    .step-row input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+      margin: 0;
+    }
+
+    .step-toggle {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: none;
+      border: none;
+      padding: 0;
+      text-align: left;
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .step-text {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .chevron {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--ink-faint);
+      transition: transform 0.2s ease, color 0.15s ease;
+    }
+
+    li.expanded .chevron {
+      transform: rotate(90deg);
+      color: var(--accent);
+    }
+
+    .step-detail {
+      display: none;
+      background: var(--bg);
+      border-top: 1px solid var(--line);
+      padding: 12px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    li.expanded .step-detail {
+      display: block;
+    }
+
+    .step-detail code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--paper);
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      color: var(--accent);
+    }
+
+    /* Checkpoint Banner */
+    .checkpoint {
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+
+    .checkpoint strong {
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .detail.exit-panel .checkpoint {
+      background: var(--amber-soft);
+      border-color: var(--amber-border);
+    }
+
+    .detail.exit-panel .checkpoint strong {
+      color: var(--amber);
+    }
+
+    .detail.exit-panel .step-row input[type="checkbox"] {
+      accent-color: var(--amber);
+    }
+
+    .detail.exit-panel li.expanded .chevron {
+      color: var(--amber);
+    }
+
+    .detail.exit-panel .detail-eyebrow {
+      color: var(--amber);
+    }
+
+    /* Modal for Architecture & Markdown Export */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--ink-soft);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      font-size: 13.5px;
+    }
+
+    .modal-body pre {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.5;
+      overflow-x: auto;
+      color: var(--ink);
+    }
+
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 12px 20px;
+      border-top: 1px solid var(--line);
+      background: var(--paper-card);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--paper);
+      border: 1px solid var(--accent);
+      color: var(--ink);
+      font-size: 13px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.25s ease;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 840px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      nav.index {
+        position: static;
+        display: flex;
+        overflow-x: auto;
+        gap: 6px;
+        padding: 10px;
+      }
+
+      .nav-header,
+      .idx-divider {
+        display: none;
+      }
+
+      .idx-item {
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        min-width: 72px;
+        text-align: center;
+        font-size: 11px;
+        padding: 8px 6px;
+      }
+
+      .idx-title {
+        flex: none;
+      }
+
+      main.detail {
+        padding: 20px 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="shell">
+    <!-- Masthead -->
+    <div class="masthead">
+      <div class="masthead-text">
+        <div class="badge-tag">SprintIQ Monorepo</div>
+        <h1>🚀 CI/CD Implementation Tracker</h1>
+        <p class="goal">
+          Interactive tracking checklist for SprintIQ's continuous integration and deployment pipeline.
+          Progress is automatically saved in your browser's <code>localStorage</code>.
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn" id="btnArch">🗺️ Architecture</button>
+        <button class="btn" id="btnExport">📋 Export Markdown</button>
+        <button class="btn" id="themeToggle">🌙 Dark</button>
+      </div>
+    </div>
+
+    <!-- Overall Progress Card -->
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-title">⚡ Pipeline Implementation Progress</span>
+        <span class="progress-stats" id="progressLabel">0 / 0 steps done (0%)</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- Toolbar: Search & Filter -->
+    <div class="toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search CI/CD tasks (e.g. docker, secrets, health)...">
+      </div>
+      <div class="filter-pills">
+        <button class="pill-btn active" data-filter="all">All</button>
+        <button class="pill-btn" data-filter="pending">Pending</button>
+        <button class="pill-btn" data-filter="completed">Done</button>
+      </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="layout">
+      <nav class="index" id="indexNav"></nav>
+      <main class="detail" id="detailPanel">
+        <p class="detail-hint">Loading implementation details…</p>
+      </main>
+    </div>
+  </div>
+
+  <!-- Architecture Diagram Modal -->
+  <div class="modal-overlay" id="archModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Target CI/CD Architecture Flow</h3>
+        <button class="modal-close" id="archClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <pre><code>Developer
+    │
+    ▼
+Git Push / Pull Request
+    │
+    ▼
+GitHub Actions
+    │
+    ├── Lint (Web ESLint)
+    ├── Build (Workspace Build)
+    └── Test
+         │
+       PASS
+         ▼
+    Docker Build (Multi-stage)
+         │
+         ▼
+  Container Registry (GHCR / DockerHub)
+         │
+         ▼
+  Production Server
+         │
+         ▼
+    Docker Compose
+         │
+    ┌────┴────┐
+    ▼         ▼
+   Web       API
+              │
+        ┌─────┴─────┐
+        ▼           ▼
+    PostgreSQL     Redis
+        │
+        ▼
+   Health Check (/api/health)
+        │
+        ▼
+      LIVE</code></pre>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" id="archModalCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Markdown Modal -->
+  <div class="modal-overlay" id="exportModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Export Markdown Index</h3>
+        <button class="modal-close" id="exportClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--ink-soft); margin-top:0;">Copy this markdown checklist directly into
+          <code>CICD_Implementation_Index.md</code>:</p>
+        <pre id="exportContent"><code></code></pre>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-accent" id="btnCopyMd">📋 Copy to Clipboard</button>
+        <button class="btn" id="exportModalCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">✅ Copied to clipboard!</div>
+
+  <script>
+    // ==========================================
+    // Phase & Step Data Definitions
+    // Matches docs/cicd/CICD_Implementation_Index.md
+    // ==========================================
+    const phases = [
+      {
+        num: "01",
+        title: "CI with GitHub Actions",
+        checkpoint: "CI runs on push/PR, installs dependencies with npm ci, validates linter, and builds all workspaces successfully.",
+        steps: [
+          { t: "Repository CI Setup", d: "Configure initial repository settings, branches, and GitHub Actions workflow permissions.", init: true },
+          { t: "GitHub Actions Workflow", d: "Define the CI workflow in <code>.github/workflows/ci.yml</code> with triggers for push and pull request on main.", init: true },
+          { t: "Dependency Installation", d: "Perform clean, deterministic installation using <code>npm ci</code> with Node.js 22 and caching.", init: true },
+          { t: "Web Lint Validation", d: "Run ESLint verification across the web workspace (<code>npm run lint --workspace=web</code>) to catch lint errors.", init: true },
+          { t: "Workspace Build Validation", d: "Compile and build all workspaces (<code>npm run build --workspaces</code>): api, web, and shared-types.", init: true },
+          { t: "Verify CI Run", d: "Commit and trigger the workflow on GitHub, verifying that all pipeline steps succeed with a green check.", init: true },
+          { t: "Pull Request CI verification — skipped for now", d: "Optional branch protection requiring green CI status checks before merging PRs into main.", init: false }
+        ]
+      },
+      {
+        num: "02",
+        title: "Dockerization",
+        checkpoint: "Both frontend and backend build into lightweight Docker images and run locally.",
+        steps: [
+          { t: "Docker Setup", d: "Verify Docker engine is active and define containerization structure across the monorepo.", init: true },
+          { t: "API Dockerfile", d: "Create multi-stage <code>apps/api/Dockerfile</code> based on <code>node:22-alpine</code> to compile TypeScript and run Express in production.", init: true },
+          { t: "Web Dockerfile", d: "Create multi-stage <code>apps/web/Dockerfile</code> compiling Vite static assets and serving via lightweight <code>nginx:alpine</code>.", init: true },
+          { t: ".dockerignore", d: "Configure root <code>.dockerignore</code> to omit <code>node_modules</code>, <code>dist</code>, <code>.git</code>, and secret <code>.env</code> files from build context.", init: true },
+          { t: "Build Docker Images", d: "Build both container images locally (<code>docker build -f apps/api/Dockerfile .</code> and <code>docker build -f apps/web/Dockerfile .</code>).", init: true },
+          { t: "Run Containers Locally", d: "Launch containers individually to confirm ports 3000 and 8080 bind properly and services respond.", init: true }
+        ]
+      },
+      {
+        num: "03",
+        title: "Docker Compose",
+        checkpoint: "Entire stack (Web, API, Postgres, Redis) starts reliably with a single docker compose up.",
+        steps: [
+          { t: "Compose Configuration", d: "Define multi-service orchestration in root <code>docker-compose.yml</code>.", init: true },
+          { t: "SprintIQ API", d: "Configure <code>sprintiq-api</code> service with environment links and dependency waiting on postgres and redis.", init: true },
+          { t: "SprintIQ Web", d: "Configure <code>sprintiq-web</code> service mapping port 8080:80 with dependency on API.", init: true },
+          { t: "PostgreSQL", d: "Configure <code>postgres:16-alpine</code> service with port 5432 and named volume <code>sprintiq-postgres-data</code> for persistence.", init: true },
+          { t: "Redis", d: "Configure <code>redis:7-alpine</code> container for caching and refresh token storage on port 6379.", init: true },
+          { t: "Environment Variables", d: "Set up <code>.env</code> interpolation for DB credentials, connection strings, and JWT keys.", init: true },
+          { t: "Health Checks", d: "Verify container startup order and confirm <code>GET http://localhost:3000/api/health</code> returns status ok.", init: true }
+        ]
+      },
+      {
+        num: "04",
+        title: "Container Registry",
+        checkpoint: "Images are automatically built, tagged, and published to the container registry on every main push.",
+        steps: [
+          { t: "Registry Setup", d: "Configure GitHub Container Registry (GHCR - <code>ghcr.io</code>) or Docker Hub repository for SprintIQ web and api.", init: false },
+          { t: "Authenticate from GitHub Actions", d: "Use <code>docker/login-action</code> with <code>GITHUB_TOKEN</code> or personal access token to authenticate in CI.", init: false },
+          { t: "Build Images in CI", d: "Set up <code>docker/build-push-action</code> in GitHub Actions with build cache for maximum speed.", init: false },
+          { t: "Tag Images", d: "Implement tagging strategy: semantic release version (<code>v1.0.0</code>), git commit SHA, and <code>latest</code>.", init: false },
+          { t: "Push Images", d: "Publish production-ready container images to the registry on every push to the <code>main</code> branch.", init: false }
+        ]
+      },
+      {
+        num: "05",
+        title: "CD / Deployment",
+        checkpoint: "Application deploys to production server and passes health check automatically.",
+        steps: [
+          { t: "Production Server", d: "Provision Ubuntu VPS / cloud server (AWS EC2, DigitalOcean, Hetzner, etc.) with firewall rules (ports 22, 80, 443).", init: false },
+          { t: "Docker Installation", d: "Install Docker engine and Docker Compose plugin on the production host system.", init: false },
+          { t: "Environment Configuration", d: "Set up production <code>.env</code> file on the server with production database credentials and random JWT secret.", init: false },
+          { t: "Pull Docker Images", d: "Pull the latest versioned images from GHCR onto the host server.", init: false },
+          { t: "Deploy with Docker Compose", d: "Execute <code>docker compose -f docker-compose.prod.yml up -d</code> on deployment.", init: false },
+          { t: "Restart / Update Containers", d: "Automate container updates without orphaned containers (<code>--remove-orphans</code>).", init: false },
+          { t: "Deployment Health Check", d: "Run automated healthcheck verification probe against <code>http://localhost:3000/api/health</code> post-deploy.", init: false }
+        ]
+      },
+      {
+        num: "06",
+        title: "Nginx & HTTPS",
+        checkpoint: "Custom domain secured with SSL, routing web and API requests seamlessly.",
+        steps: [
+          { t: "Domain Configuration", d: "Configure DNS records (A and CNAME) pointing your domain/subdomain to the production server IP.", init: false },
+          { t: "Nginx Setup", d: "Configure reverse proxy in Nginx with optimized gzip compression, buffer sizes, and timeouts.", init: false },
+          { t: "Frontend Routing", d: "Configure SPA fallback (<code>try_files $uri $uri/ /index.html;</code>) for client-side React Router navigation.", init: false },
+          { t: "API Reverse Proxy", d: "Forward all <code>/api/*</code> requests with correct headers (<code>X-Forwarded-For</code>, <code>Host</code>) to the Node API container.", init: false },
+          { t: "HTTPS / SSL", d: "Issue free auto-renewing SSL/TLS certificates using Certbot / Let's Encrypt with HTTP->HTTPS redirection.", init: false },
+          { t: "Production Verification", d: "Test complete flow in browser over secure HTTPS URL with DevTools network check.", init: false }
+        ]
+      },
+      {
+        num: "07",
+        title: "Secrets & Configuration",
+        checkpoint: "Zero hardcoded credentials; all production secrets securely injected and isolated.",
+        steps: [
+          { t: "GitHub Secrets", d: "Save deployment credentials (<code>SSH_HOST</code>, <code>SSH_USER</code>, <code>SSH_KEY</code>, <code>REGISTRY_TOKEN</code>) in GitHub Actions Secrets.", init: false },
+          { t: "Production Environment Variables", d: "Keep production environment variables strictly isolated from repository source code.", init: false },
+          { t: "Database Secrets", d: "Generate strong 32+ character random passwords for Postgres production instance.", init: false },
+          { t: "JWT / Redis Secrets", d: "Generate cryptographically secure high-entropy strings for <code>JWT_ACCESS_SECRET</code>.", init: false },
+          { t: "Secret Rotation", d: "Document key rotation schedule and procedure for invalidating leaked or expired keys.", init: false }
+        ]
+      },
+      {
+        num: "08",
+        title: "Production Safety",
+        checkpoint: "Production system recovers automatically from failures with backups and rollbacks.",
+        steps: [
+          { t: "Health Checks", d: "Add Compose <code>healthcheck</code> blocks and configure external ping uptime monitoring (e.g. BetterStack/UptimeKuma).", init: false },
+          { t: "Logs", d: "Configure JSON file logging driver with maximum file size limits (<code>max-size: 10m, max-file: 3</code>) to prevent disk fill.", init: false },
+          { t: "Container Restart Policy", d: "Set <code>restart: unless-stopped</code> across all production containers so services survive reboots.", init: false },
+          { t: "Database Backup", d: "Set up automated daily <code>pg_dump</code> cron backup with upload to encrypted S3 bucket storage.", init: false },
+          { t: "Rollback", d: "Establish fast rollback command to immediately redeploy the previous image tag on catastrophic bugs.", init: false },
+          { t: "Deployment Failure Handling", d: "Add pipeline failure handlers notifying Discord/Slack if a deployment job crashes.", init: false }
+        ]
+      },
+      {
+        num: "09",
+        title: "Final CI/CD Pipeline",
+        exit: true,
+        checkpoint: "Fully autonomous CI/CD: Push code to main → tested → built → deployed to production with zero manual steps.",
+        steps: [
+          { t: "Pull Request → CI", d: "Every PR to main runs automated linting, typechecking, and tests.", init: false },
+          { t: "Merge → Build", d: "Merging PR to main branch initiates production deployment workflow.", init: false },
+          { t: "Docker Image → Registry", d: "Builds production images and pushes tags to container registry.", init: false },
+          { t: "Deploy → Production", d: "Triggers SSH deployment script on VPS to pull and restart containers.", init: false },
+          { t: "Health Check", d: "Automated verification confirms web UI and API health endpoints respond.", init: false },
+          { t: "Rollback on Failure", d: "If health checks fail within 60 seconds, deployment automatically rolls back to previous commit.", init: false }
+        ]
+      }
+    ];
+
+    const STORAGE_KEY = 'sprintiq_cicd_tracker_state';
+    let appState = {
+      theme: 'dark',
+      filter: 'all',
+      searchQuery: '',
+      progress: {}
+    };
+    let activePhase = 0;
+
+    // Elements
+    const navEl = document.getElementById('indexNav');
+    const detailEl = document.getElementById('detailPanel');
+    const themeBtn = document.getElementById('themeToggle');
+    const progressFill = document.getElementById('progressFill');
+    const progressLabel = document.getElementById('progressLabel');
+    const searchInput = document.getElementById('searchInput');
+    const toastEl = document.getElementById('toast');
+
+    // Modals
+    const archModal = document.getElementById('archModal');
+    const exportModal = document.getElementById('exportModal');
+    const btnArch = document.getElementById('btnArch');
+    const btnExport = document.getElementById('btnExport');
+    const archClose = document.getElementById('archClose');
+    const archModalCloseBtn = document.getElementById('archModalCloseBtn');
+    const exportClose = document.getElementById('exportClose');
+    const exportModalCloseBtn = document.getElementById('exportModalCloseBtn');
+    const exportContent = document.getElementById('exportContent');
+    const btnCopyMd = document.getElementById('btnCopyMd');
+
+    function stepId(pi, si) { return 'p' + pi + '_s' + si; }
+
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 2500);
+    }
+
+    // ==========================================
+    // LocalStorage Management
+    // ==========================================
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          appState.theme = parsed.theme || 'dark';
+          appState.progress = parsed.progress || {};
+        } else {
+          // First time initialization: populate from Markdown init defaults
+          phases.forEach((p, pi) => {
+            p.steps.forEach((s, si) => {
+              if (s.init) {
+                appState.progress[stepId(pi, si)] = true;
+              }
+            });
+          });
+          saveState();
+        }
+      } catch (err) {
+        console.error('Could not load localStorage state:', err);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (err) {
+        console.error('Could not save to localStorage:', err);
+      }
+    }
+
+    // ==========================================
+    // Theme Management
+    // ==========================================
+    function applyTheme() {
+      document.documentElement.setAttribute('data-theme', appState.theme);
+      themeBtn.textContent = appState.theme === 'dark' ? '🌙 Dark' : '☀️ Light';
+    }
+
+    themeBtn.addEventListener('click', () => {
+      appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+      applyTheme();
+      saveState();
+    });
+
+    // ==========================================
+    // Rendering Navigation
+    // ==========================================
+    function renderNav() {
+      navEl.innerHTML = '';
+
+      const head = document.createElement('div');
+      head.className = 'nav-header';
+      head.innerHTML = `<span>Implementation Phases</span><span>${phases.length} Total</span>`;
+      navEl.appendChild(head);
+
+      phases.forEach((p, i) => {
+        if (i === phases.length - 1) {
+          const div = document.createElement('div');
+          div.className = 'idx-divider';
+          navEl.appendChild(div);
+        }
+        const total = p.steps.length;
+        const doneCount = p.steps.filter((_, si) => !!appState.progress[stepId(i, si)]).length;
+
+        const btn = document.createElement('button');
+        btn.className = 'idx-item' +
+          (i === activePhase ? ' active' : '') +
+          (doneCount === total ? ' done' : '') +
+          (p.exit ? ' exit' : '');
+
+        btn.innerHTML = `
+      <span class="idx-num">${p.num}</span>
+      <span class="idx-title">${p.title}</span>
+      <span class="idx-badge">${doneCount}/${total}</span>
+    `;
+        btn.onclick = () => {
+          activePhase = i;
+          renderNav();
+          renderDetail();
+        };
+        navEl.appendChild(btn);
+      });
+    }
+
+    // ==========================================
+    // Rendering Detail Panel
+    // ==========================================
+    function renderDetail() {
+      const p = phases[activePhase];
+      detailEl.className = 'detail' + (p.exit ? ' exit-panel' : '');
+
+      const query = appState.searchQuery.trim().toLowerCase();
+      const filter = appState.filter;
+
+      const filteredSteps = p.steps.map((s, si) => ({ ...s, origIndex: si }))
+        .filter(s => {
+          const id = stepId(activePhase, s.origIndex);
+          const isDone = !!appState.progress[id];
+
+          if (filter === 'pending' && isDone) return false;
+          if (filter === 'completed' && !isDone) return false;
+
+          if (query) {
+            const textMatch = s.t.toLowerCase().includes(query) || s.d.toLowerCase().includes(query);
+            if (!textMatch) return false;
+          }
+          return true;
+        });
+
+      let stepsHtml = '';
+      if (filteredSteps.length === 0) {
+        stepsHtml = `<li style="padding:18px; text-align:center; color:var(--ink-soft); font-size:13.5px;">No tasks match your current search/filter.</li>`;
+      } else {
+        stepsHtml = filteredSteps.map((s) => {
+          const id = stepId(activePhase, s.origIndex);
+          const isChecked = !!appState.progress[id];
+          return `
+        <li id="li-${id}" class="${isChecked ? 'checked' : ''}">
+          <div class="step-row">
+            <input type="checkbox" id="${id}-cb" ${isChecked ? 'checked' : ''}>
+            <button class="step-toggle" id="${id}-tg" title="Click to view details">
+              <span class="step-text">${s.t}</span>
+              <span class="chevron">›</span>
+            </button>
+          </div>
+          <div class="step-detail">${s.d}</div>
+        </li>
+      `;
+        }).join('');
+      }
+
+      const totalStepsInPhase = p.steps.length;
+      const doneStepsInPhase = p.steps.filter((_, si) => !!appState.progress[stepId(activePhase, si)]).length;
+
+      detailEl.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-title-group">
+        <p class="detail-eyebrow">Phase ${p.num} ${p.exit ? '• Final Exit Gate' : ''}</p>
+        <h2>${p.title}</h2>
+        <p class="detail-hint">${doneStepsInPhase} of ${totalStepsInPhase} tasks completed. Tap a step to view details, or check off as you progress.</p>
+      </div>
+      <div class="phase-actions">
+        <button class="btn btn-sm" id="btnTogglePhase">${doneStepsInPhase === totalStepsInPhase ? '↺ Reset Phase' : '✓ Mark Phase Done'}</button>
+      </div>
+    </div>
+
+    <ul class="steps">${stepsHtml}</ul>
+
+    <div class="checkpoint">
+      <strong>${p.exit ? '🏁 Phase 9 Exit Criteria' : '🎯 Checkpoint & Target'}</strong>
+      ${p.checkpoint}
+    </div>
+  `;
+
+      // Attach event handlers for checkboxes and collapsible toggles
+      filteredSteps.forEach((s) => {
+        const id = stepId(activePhase, s.origIndex);
+        const cb = document.getElementById(id + '-cb');
+        const tg = document.getElementById(id + '-tg');
+        const li = document.getElementById('li-' + id);
+
+        if (cb && tg && li) {
+          cb.addEventListener('change', () => {
+            appState.progress[id] = cb.checked;
+            li.classList.toggle('checked', cb.checked);
+            renderNav();
+            updateProgress();
+            saveState();
+            renderDetail();
+          });
+
+          tg.addEventListener('click', () => {
+            li.classList.toggle('expanded');
+          });
+        }
+      });
+
+      // Bulk phase toggle
+      const btnTogglePhase = document.getElementById('btnTogglePhase');
+      if (btnTogglePhase) {
+        btnTogglePhase.addEventListener('click', () => {
+          const allDone = doneStepsInPhase === totalStepsInPhase;
+          p.steps.forEach((_, si) => {
+            const id = stepId(activePhase, si);
+            appState.progress[id] = !allDone;
+          });
+          renderNav();
+          updateProgress();
+          saveState();
+          renderDetail();
+          showToast(allDone ? 'Phase reset to pending' : 'Phase marked as complete!');
+        });
+      }
+    }
+
+    // ==========================================
+    // Progress Calculation
+    // ==========================================
+    function updateProgress() {
+      let total = 0, done = 0;
+      phases.forEach((p, pi) => {
+        p.steps.forEach((_, si) => {
+          total++;
+          if (appState.progress[stepId(pi, si)]) done++;
+        });
+      });
+
+      const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+      progressFill.style.width = percent + '%';
+      progressLabel.textContent = `${done} / ${total} steps done (${percent}%)`;
+    }
+
+    // ==========================================
+    // Filter Pills & Search
+    // ==========================================
+    document.querySelectorAll('.pill-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        appState.filter = btn.getAttribute('data-filter');
+        renderDetail();
+      });
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      appState.searchQuery = e.target.value;
+      renderDetail();
+    });
+
+    // ==========================================
+    // Modals & Export Markdown
+    // ==========================================
+    btnArch.addEventListener('click', () => archModal.classList.add('open'));
+    archClose.addEventListener('click', () => archModal.classList.remove('open'));
+    archModalCloseBtn.addEventListener('click', () => archModal.classList.remove('open'));
+    archModal.addEventListener('click', (e) => { if (e.target === archModal) archModal.classList.remove('open'); });
+
+    btnExport.addEventListener('click', () => {
+      let md = `# Implementation Index\n\n`;
+      phases.forEach((p) => {
+        md += `## PHASE ${parseInt(p.num, 10)} — ${p.title}\n\n`;
+        p.steps.forEach((s, si) => {
+          const isChecked = !!appState.progress[stepId(phases.indexOf(p), si)];
+          md += `- [${isChecked ? 'x' : ' '}] ${s.t}\n`;
+        });
+        md += `\n`;
+      });
+
+      exportContent.querySelector('code').textContent = md;
+      exportModal.classList.add('open');
+    });
+
+    exportClose.addEventListener('click', () => exportModal.classList.remove('open'));
+    exportModalCloseBtn.addEventListener('click', () => exportModal.classList.remove('open'));
+    exportModal.addEventListener('click', (e) => { if (e.target === exportModal) exportModal.classList.remove('open'); });
+
+    btnCopyMd.addEventListener('click', () => {
+      const text = exportContent.querySelector('code').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Markdown checklist copied to clipboard!');
+      }).catch(() => {
+        showToast('Unable to copy automatically. Please copy text manually.');
+      });
+    });
+
+    // ==========================================
+    // Initial Boot
+    // ==========================================
+    function init() {
+      loadState();
+      applyTheme();
+      renderNav();
+      renderDetail();
+      updateProgress();
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
