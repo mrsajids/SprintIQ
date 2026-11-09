@@ -18,6 +18,9 @@ RUN npm ci
 COPY packages/shared-types ./packages/shared-types
 COPY apps/api ./apps/api
 
+# Generate Prisma Client before TypeScript compilation
+RUN cd apps/api && npx prisma generate
+
 # Build API
 RUN npm run build --workspace=api
 
