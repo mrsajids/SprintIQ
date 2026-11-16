@@ -23,7 +23,7 @@ From **requirements and issues** to **sprints, documentation, code, and releases
 * 🔔 **Notifications** — Stay informed about assignments, mentions, updates, and deadlines.
 * 📈 **Analytics** — Understand team performance, sprint velocity, workload, and delivery trends.
 
----
+--- 
 
 ## 🎯 Vision
 
