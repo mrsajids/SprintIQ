@@ -10,7 +10,7 @@ From **requirements and issues** to **sprints, documentation, code, and releases
 > 
 ---
 
-## ✨ Core Features
+## ✨ Core Features 
 
 * 🤖 **AI Assistant** — Generate requirements, break down tasks, summarize issues, and assist with planning. 
 * 📋 **Issue Management** — Create, assign, prioritize, label, and track issues.
